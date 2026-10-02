@@ -1,4 +1,6 @@
 import Link from "next/link";
+import CartLink from "@/components/CartLink";
+import AuthLinks from "./AuthLinks";
 
 export default function Header() {
   return (
@@ -7,10 +9,10 @@ export default function Header() {
         <Link href="/" className="text-xl font-bold">
           MyStore
         </Link>
-        <nav className="flex gap-6 text-sm">
+        <nav className="flex items-center gap-6 text-sm">
           <Link href="/products">Products</Link>
-          <Link href="/cart">Cart</Link>
-          <Link href="/login">Login</Link>
+          <CartLink />
+          <AuthLinks />
         </nav>
       </div>
     </header>

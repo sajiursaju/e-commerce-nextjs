@@ -1,10 +1,56 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/components/CartContext";
 
 export default function CartPage() {
-  const { items, removeFromCart, updateQuantity, totalPrice } = useCart();
+  const { items, removeFromCart, updateQuantity, clearCart, totalPrice } =
+    useCart();
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [orderId, setOrderId] = useState<number | null>(null);
+
+  async function handleCheckout() {
+    setError("");
+    setLoading(true);
+
+    const res = await fetch("/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items }),
+    });
+    const data = await res.json();
+    setLoading(false);
+
+    if (res.status === 401) {
+      router.push("/login");
+      return;
+    }
+    if (!res.ok) {
+      setError(data.error || "Something went wrong");
+      return;
+    }
+
+    clearCart();
+    setOrderId(data.orderId);
+  }
+
+  if (orderId) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-10">
+        <h1 className="mb-4 text-2xl font-bold">Thank you!</h1>
+        <p className="mb-4 text-gray-600">
+          Your order #{orderId} has been placed.
+        </p>
+        <Link href="/" className="underline">
+          Continue shopping
+        </Link>
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (
@@ -71,10 +117,16 @@ export default function CartPage() {
         ))}
       </ul>
 
+      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+
       <div className="mt-6 flex items-center justify-between">
         <p className="text-lg font-bold">Total: ${totalPrice.toFixed(2)}</p>
-        <button className="rounded bg-black px-6 py-3 text-white hover:bg-gray-800">
-          Checkout
+        <button
+          onClick={handleCheckout}
+          disabled={loading}
+          className="rounded bg-black px-6 py-3 text-white hover:bg-gray-800 disabled:opacity-50"
+        >
+          {loading ? "Placing order..." : "Checkout"}
         </button>
       </div>
     </div>

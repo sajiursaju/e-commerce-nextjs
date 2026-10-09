@@ -28,7 +28,12 @@ export default function LoginPage() {
       setError(data.error || "Something went wrong");
       return;
     }
-    router.push("/");
+    if (data.role === "admin") {
+      router.push("/admin");
+    } else {
+      router.push("/");
+    }
+    
     router.refresh();
   }
 

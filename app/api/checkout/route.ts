@@ -8,7 +8,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Please log in to check out" }, { status: 401 });
   }
 
-  const { items } = await request.json();
+  if (session.role === "admin") {
+    return NextResponse.json(
+      { error: "Admin accounts can't place orders. Use a customer account to shop." },
+      { status: 403 }
+    );
+  }
+
+  const { items } = await request.json().catch(() => ({ items: null }));
   if (!Array.isArray(items) || items.length === 0) {
     return NextResponse.json({ error: "Your cart is empty" }, { status: 400 });
   }

@@ -4,8 +4,11 @@ import { cookies } from "next/headers";
 const secret = new TextEncoder().encode(process.env.SESSION_SECRET);
 const COOKIE_NAME = "session";
 
-export async function createSession(user: { id: number; name: string }) {
-  const token = await new SignJWT({ id: user.id, name: user.name })
+export type SessionUser = { id: number; name: string; role: "user" | "admin" };
+
+export async function createSession(user: { id: number; name: string; role?: string }) {
+  const role = user.role === "admin" ? "admin" : "user";
+  const token = await new SignJWT({ id: user.id, name: user.name, role })
     .setProtectedHeader({ alg: "HS256" })
     .setExpirationTime("7d")
     .sign(secret);
@@ -20,13 +23,17 @@ export async function createSession(user: { id: number; name: string }) {
   });
 }
 
-export async function getSession() {
+export async function getSession(): Promise<SessionUser | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, secret);
-    return { id: payload.id as number, name: payload.name as string };
+    return {
+      id: payload.id as number,
+      name: payload.name as string,
+      role: payload.role === "admin" ? "admin" : "user",
+    };
   } catch {
     return null;
   }

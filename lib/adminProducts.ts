@@ -1,6 +1,6 @@
 import { pool } from "@/lib/db";
 import { getSession } from "@/lib/session";
-
+import { productCategories } from "@/config/site";
 export type Column = {
   name: string;
   kind: "number" | "textarea" | "text";
@@ -51,7 +51,10 @@ export function parseInput(columns: Column[], body: any) {
       const n = Number(text);
       if (!Number.isFinite(n) || n < 0) return { error: `${col.name} must be a valid number` };
       values[col.name] = n;
+
     } else {
+      if (col.name === "category" && !productCategories.some((c) => c.value === text))
+        return { error: "Choose a valid category" };
       values[col.name] = text;
     }
   }

@@ -26,23 +26,38 @@ export default function AuthLinks() {
 
   if (user) {
     const isAdmin = user.role === "admin";
+    const firstName = user.name.trim().split(" ")[0];
+    const initial = user.name.trim().charAt(0).toUpperCase();
+
     return (
-      <div className="flex items-center gap-3">
-        {user.hasAvatar && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src="/api/account/avatar" alt="" className="h-8 w-8 rounded-full object-cover" />
-        )}
-        <span>Hi, {user.name}</span>
+      <div className="flex items-center gap-2 whitespace-nowrap text-sm sm:gap-3">
+        <Link href="/account" className="flex items-center gap-2" aria-label="My account">
+          {user.hasAvatar ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src="/api/account/avatar"
+              alt=""
+              className="h-8 w-8 shrink-0 rounded-full border object-cover"
+            />
+          ) : (
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border bg-gray-100 text-sm font-semibold text-gray-700">
+              {initial}
+            </span>
+          )}
+          <span className="hidden sm:inline">Hi, {firstName}</span>
+        </Link>
+
         {!isAdmin && (
           <>
-            <Link href="/orders" className="underline">
+            <Link href="/orders" className="hidden underline sm:inline">
               My Orders
             </Link>
-            <Link href="/account" className="underline">
+            <Link href="/account" className="hidden underline sm:inline">
               Account
             </Link>
           </>
         )}
+
         <button onClick={handleLogout} className="underline">
           Logout
         </button>
@@ -51,9 +66,13 @@ export default function AuthLinks() {
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <Link href="/login" className="underline">Login</Link>
-      <Link href="/signup" className="underline">Sign up</Link>
+    <div className="flex items-center gap-2 whitespace-nowrap text-sm sm:gap-3">
+      <Link href="/login" className="underline">
+        Login
+      </Link>
+      <Link href="/signup" className="underline">
+        Sign up
+      </Link>
     </div>
   );
 }

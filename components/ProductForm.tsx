@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Column } from "@/lib/adminProducts";
+import { productCategories } from "@/config/site";
 
 export default function ProductForm({
   columns,
@@ -33,9 +34,11 @@ export default function ProductForm({
     const json = await res.json();
     setSaving(false);
     if (!res.ok) return setError(json.error);
-    router.push("/admin");
+    router.push("/admin/products");
     router.refresh();
   }
+
+  const field = "w-full rounded border p-2";
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
@@ -45,12 +48,25 @@ export default function ProductForm({
             {col.name}
             {col.required && " *"}
           </span>
-          {col.kind === "textarea" ? (
+          {col.name === "category" ? (
+            <select
+              value={values.category ?? ""}
+              onChange={(e) => setValues({ ...values, category: e.target.value })}
+              className={field}
+            >
+              <option value="">Select a category</option>
+              {productCategories.map((c) => (
+                <option key={c.value} value={c.value}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+          ) : col.kind === "textarea" ? (
             <textarea
               rows={4}
               value={values[col.name] ?? ""}
               onChange={(e) => setValues({ ...values, [col.name]: e.target.value })}
-              className="w-full rounded border p-2"
+              className={field}
             />
           ) : (
             <input
@@ -59,7 +75,7 @@ export default function ProductForm({
               min={col.kind === "number" ? 0 : undefined}
               value={values[col.name] ?? ""}
               onChange={(e) => setValues({ ...values, [col.name]: e.target.value })}
-              className="w-full rounded border p-2"
+              className={field}
             />
           )}
         </label>

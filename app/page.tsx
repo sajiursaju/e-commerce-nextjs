@@ -1,7 +1,7 @@
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import { getProducts } from "@/lib/products";
-
+import HeroCarousel from "@/components/HeroCarousel";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {

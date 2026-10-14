@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { pool } from "@/lib/db";
 import { productCategories } from "@/config/site";
+import ProductCard from "@/components/ProductCard";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,25 @@ const SORTS: Record<string, { label: string; sql: string }> = {
   name: { label: "Name A-Z", sql: "name ASC" },
 };
 
+// Whitelist: finds a parent OR a sub-category.
+// A parent also includes the slugs of its sub-categories.
+function findCategory(value: string) {
+  for (const c of productCategories) {
+    if (c.value === value) {
+      return {
+        value: c.value,
+        label: c.label,
+        slugs: [c.value, ...(c.children?.map((s) => s.value) ?? [])],
+      };
+    }
+    const child = c.children?.find((s) => s.value === value);
+    if (child) {
+      return { value: child.value, label: child.label, slugs: [child.value] };
+    }
+  }
+  return null;
+}
+
 export default async function ProductsPage({
   searchParams,
 }: {
@@ -19,7 +39,7 @@ export default async function ProductsPage({
   const { q = "", sort = "newest", category = "" } = await searchParams;
   const search = q.trim().slice(0, 100);
   const order = (SORTS[sort] ?? SORTS.newest).sql; // whitelisted
-  const active = productCategories.find((c) => c.value === category) ?? null; // whitelisted
+  const active = findCategory(category); // whitelisted
 
   const where: string[] = [];
   const params: string[] = [];
@@ -28,8 +48,8 @@ export default async function ProductsPage({
     params.push(`%${search}%`);
   }
   if (active) {
-    where.push("category = ?");
-    params.push(active.value);
+    where.push(`category IN (${active.slugs.map(() => "?").join(",")})`);
+    params.push(...active.slugs);
   }
   const sql = `SELECT * FROM products ${
     where.length ? "WHERE " + where.join(" AND ") : ""
@@ -52,9 +72,14 @@ export default async function ProductsPage({
         <select name="category" defaultValue={active?.value ?? ""} className="rounded border px-3 py-2">
           <option value="">All categories</option>
           {productCategories.map((c) => (
-            <option key={c.value} value={c.value}>
-              {c.label}
-            </option>
+            <optgroup key={c.value} label={c.label}>
+              <option value={c.value}>All {c.label}</option>
+              {c.children?.map((s) => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
+              ))}
+            </optgroup>
           ))}
         </select>
         <select name="sort" defaultValue={sort} className="rounded border px-3 py-2">
@@ -80,27 +105,17 @@ export default async function ProductsPage({
             {products.length} product{products.length === 1 ? "" : "s"}
           </p>
           <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
-            {products.map((p) => {
-              const image = p.image ?? p.image_url ?? p.img ?? null;
-              return (
-                <Link
-                  key={p.id}
-                  href={`/products/${p.id}`}
-                  className="block rounded-lg border p-3 transition hover:shadow-md"
-                >
-                  {image && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={image}
-                      alt={p.name}
-                      className="mb-3 aspect-square w-full rounded object-cover"
-                    />
-                  )}
-                  <h2 className="font-semibold">{p.name}</h2>
-                  <p className="mt-1">${Number(p.price).toFixed(2)}</p>
-                </Link>
-              );
-            })}
+            {products.map((p) => (
+              <ProductCard
+                key={p.id}
+                product={{
+                  id: p.id,
+                  name: p.name,
+                  price: Number(p.price),
+                  image: p.image ?? p.image_url ?? p.img ?? null,
+                }}
+              />
+            ))}
           </div>
         </>
       )}

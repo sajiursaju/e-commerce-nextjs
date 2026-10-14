@@ -9,11 +9,11 @@ import AuthLinks from "@/components/AuthLinks";
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur">
+    <header className="sticky top-0 z-50 bg-gray-900/95 text-white backdrop-blur">
       <AnnouncementBar />
 
       {/* Main bar */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-gray-800">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:h-[72px] lg:gap-8 lg:px-8">
           <MobileMenu />
 
@@ -22,8 +22,8 @@ export default function Header() {
             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-500 text-white shadow-md shadow-indigo-500/30">
               <ShoppingBag size={20} />
             </span>
-            <span className="text-xl font-bold tracking-tight text-gray-900">
-              My<span className="text-indigo-600">Store</span>
+            <span className="text-xl font-bold tracking-tight text-white">
+              My<span className="text-indigo-400">Store</span>
             </span>
           </Link>
 
@@ -38,15 +38,15 @@ export default function Header() {
             <Link
               href="/wishlist"
               aria-label="Wishlist"
-              className="hidden rounded-full p-2.5 text-gray-700 transition hover:bg-gray-100 sm:block"
+              className="hidden rounded-full p-2.5 text-gray-200 transition hover:bg-gray-800 hover:text-white sm:block"
             >
               <Heart size={22} />
             </Link>
 
-            {/* Cart -> /cart (your existing component) */}
+            {/* Cart -> /cart */}
             <CartLink />
 
-            {/* Login / Hi, name / Logout (your existing component) */}
+            {/* Login / Hi, name / Logout */}
             <AuthLinks />
           </div>
         </div>
@@ -58,7 +58,7 @@ export default function Header() {
       </div>
 
       {/* Category bar (desktop) */}
-      <nav className="hidden border-b border-gray-100 lg:block">
+      <nav className="hidden border-b border-gray-800 lg:block">
         <ul className="mx-auto flex h-11 max-w-7xl items-center gap-1 overflow-x-auto px-8">
           {categories.map((c) => (
             <li key={c.href}>
@@ -66,8 +66,8 @@ export default function Header() {
                 href={c.href}
                 className={`whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition ${
                   c.label === "Deals"
-                    ? "text-rose-600 hover:bg-rose-50"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                    ? "text-rose-400 hover:bg-gray-800"
+                    : "text-gray-300 hover:bg-gray-800 hover:text-white"
                 }`}
               >
                 {c.label}

@@ -1,8 +1,6 @@
-
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { pool } from "@/lib/db";
-import { getSession } from "@/lib/session";
 import { requireAdmin } from "@/lib/adminProducts";
 
 const accentColors = {
@@ -34,6 +32,7 @@ export default async function AdminLayout({
     { label: "Products", href: "/admin/products", icon: "□" },
     { label: "Customers", href: "/admin/customers", icon: "♙" },
     { label: "Orders", href: "/admin/orders", icon: "▤" },
+    { label: "Account", href: "/admin/account", icon: "◉" },
   ];
 
   return (
@@ -73,8 +72,9 @@ export default async function AdminLayout({
           <p className="mt-1 break-all text-xs text-gray-400">
             {profile?.email ?? "Email unavailable"}
           </p>
+          {/* Link -> /admin/account (stays inside the dashboard) */}
           <Link
-            href="/account"
+            href="/admin/account"
             className="mt-4 inline-block text-sm text-gray-300 hover:text-white"
           >
             My account →
@@ -85,12 +85,21 @@ export default async function AdminLayout({
       <div className="min-w-0 flex-1">
         <header className="flex items-center justify-between border-b bg-white px-6 py-4">
           <h1 className="font-semibold text-gray-800">Store Administration</h1>
-          <span
-            className="rounded-full px-3 py-1 text-xs font-semibold text-white"
-            style={{ backgroundColor: accent }}
-          >
-            Admin
-          </span>
+          <div className="flex items-center gap-4">
+            {/* Link -> / (user site) */}
+            <Link
+              href="/"
+              className="text-sm text-gray-600 hover:text-gray-900"
+            >
+              View store ↗
+            </Link>
+            <span
+              className="rounded-full px-3 py-1 text-xs font-semibold text-white"
+              style={{ backgroundColor: accent }}
+            >
+              Admin
+            </span>
+          </div>
         </header>
 
         {children}

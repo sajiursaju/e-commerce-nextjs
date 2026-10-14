@@ -22,7 +22,9 @@ export default function SearchBar() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex h-11 w-full items-center rounded-full border border-gray-300 bg-gray-50 transition focus-within:border-indigo-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-indigo-100"
+      role="search"
+      style={{ colorScheme: "light" }}
+      className="flex h-11 w-full items-center rounded-full border border-gray-300 bg-gray-50 text-gray-900 transition focus-within:border-indigo-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-indigo-100"
     >
       {/* Category dropdown with arrow */}
       <div className="relative h-full shrink-0 border-r border-gray-300">
@@ -30,10 +32,10 @@ export default function SearchBar() {
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           aria-label="Search category"
-          className="h-full cursor-pointer appearance-none rounded-l-full bg-transparent pl-4 pr-9 text-sm font-medium text-gray-700 outline-none hover:bg-gray-100"
+          className="h-full max-w-[190px] cursor-pointer appearance-none truncate rounded-l-full bg-transparent pl-4 pr-9 text-sm font-medium text-gray-700 outline-none hover:bg-gray-100"
         >
           {searchCategories.map((c) => (
-            <option key={c.value} value={c.value}>
+            <option key={c.value} value={c.value} className="bg-white text-gray-900">
               {c.label}
             </option>
           ))}
@@ -50,7 +52,8 @@ export default function SearchBar() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search for products, brands and more..."
-        className="h-full min-w-0 flex-1 bg-transparent px-4 text-sm outline-none"
+        aria-label="Search products"
+        className="h-full min-w-0 flex-1 bg-transparent px-4 text-sm text-gray-900 caret-indigo-600 outline-none placeholder:text-gray-400"
       />
 
       {/* Search button */}
